@@ -12,8 +12,7 @@ const Keys = require('./keys')
 
 const dev = Keys.ENVIRON !== 'PROD'
 const app = next({ dev })
-const routes = require('./routes')
-const handle = routes.getRequestHandler(app)
+const handle = app.getRequestHandler()
 
 const apiRoutes = require('./api/routes')
 const User = require('./api/models/User')
@@ -32,10 +31,10 @@ app
 
     // MongoDB
     mongoose.Promise = Promise
-    mongoose.connect(
-      Keys.MONGODB_URI,
-      { useNewUrlParser: true }
-    )
+    mongoose.connect(Keys.MONGODB_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true
+    })
     const db = mongoose.connection
     db.on('error', console.error.bind(console, 'connection error:'))
 
