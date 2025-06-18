@@ -32,7 +32,7 @@ export default class AppDocument extends Document {
     return (
       <Html>
         <Head>
-          <style>{`body { margin: 0 } /* custom! */`}</style>
+        <style>{'body { margin: 0 } /* custom! */'}</style>
           <meta name='viewport' content='width=device-width, initial-scale=1' />
           <meta charSet='utf-8' />
           <link
