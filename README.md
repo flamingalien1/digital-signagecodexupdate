@@ -51,6 +51,8 @@ npm install
 npm run dev
 ```
 
+Server activity and errors are written to `logs/access.log` and `logs/error.log` respectively.
+
 ### Updating the software
 
 Assuming the software was cloned from this github repository, it is possible to use the included script

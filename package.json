@@ -80,7 +80,8 @@
     "socket.io-client": "^4.7.5",
     "styled-components": "^6.1.9",
     "superagent": "^5.0.5",
-    "webfontloader": "^1.6.28"
+    "webfontloader": "^1.6.28",
+    "morgan": "^1.10.0"
   },
   "devDependencies": {
     "cross-env": "^7.0.1"

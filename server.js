@@ -1,6 +1,9 @@
 /* eslint-disable multiline-comment-style */
 const express = require('express')
 const next = require('next')
+const morgan = require('morgan')
+const fs = require('fs')
+const path = require('path')
 const mongoose = require('mongoose')
 const passport = require('passport')
 const cookieParser = require('cookie-parser')
@@ -17,10 +20,28 @@ const handle = app.getRequestHandler()
 const apiRoutes = require('./api/routes')
 const User = require('./api/models/User')
 
+const logDirectory = path.join(__dirname, 'logs')
+if (!fs.existsSync(logDirectory)) {
+  fs.mkdirSync(logDirectory)
+}
+const accessLogStream = fs.createWriteStream(path.join(logDirectory, 'access.log'), { flags: 'a' })
+const errorLogStream = fs.createWriteStream(path.join(logDirectory, 'error.log'), { flags: 'a' })
+
+process.on('unhandledRejection', err => {
+  errorLogStream.write(`${new Date().toISOString()} UnhandledRejection: ${err.stack}\n`)
+})
+
+process.on('uncaughtException', err => {
+  errorLogStream.write(`${new Date().toISOString()} UncaughtException: ${err.stack}\n`)
+  process.exit(1)
+})
+
 app
   .prepare()
   .then(() => {
     const server = express()
+
+    server.use(morgan('combined', { stream: accessLogStream }))
 
     // Allows for cross origin domain request:
     server.use(function(req, res, next) {
@@ -72,6 +93,13 @@ app
 
     // Static routes
     server.use('/uploads', express.static('uploads'))
+
+    // Error logger
+    server.use(function(err, req, res, next) {
+      const message = `${new Date().toISOString()} ${err.stack}\n`
+      errorLogStream.write(message)
+      res.status(err.status || 500).json({ error: err.message })
+    })
 
     // Next.js routes
     server.get('*', (req, res) => {
