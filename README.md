@@ -25,6 +25,8 @@ Use the demo website at [http://digitaldisplay.herokuapp.com](http://digitaldisp
 
 ### How to Run:
 
+This project requires **Node.js 18** or later.
+
 1. Set up a MongoDB installation locally (or in the cloud) and create a `digitaldisplay` database
 
 2. Run the setup utility using
@@ -33,6 +35,12 @@ Use the demo website at [http://digitaldisplay.herokuapp.com](http://digitaldisp
 npm run setup
 ```
 This command checks if a `.env` file exists and, if not, runs the interactive `makeconf` utility. Specify the URI to your database when prompted.
+
+An example configuration is provided in `.env.example` using a test MongoDB URI:
+
+```bash
+MONGODB_URI=mongodb+srv://bdowdy:November15@cluster0.onongy1.mongodb.net/
+```
 
 4. Install dependencies and run the program
 
