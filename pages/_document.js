@@ -1,25 +1,38 @@
-/**
- * Overloads the _document container from Next.js in order to add custom fonts
- */
-
-import Document, { Head, Main, NextScript } from 'next/document'
+import Document, { Html, Head, Main, NextScript } from 'next/document'
 import { ServerStyleSheet } from 'styled-components'
-import flush from 'styled-jsx/server'
+import React from 'react'
 
-class AppDocument extends Document {
-  static getInitialProps({ renderPage }) {
+export default class AppDocument extends Document {
+  static async getInitialProps(ctx) {
     const sheet = new ServerStyleSheet()
-    const page = renderPage(App => props => sheet.collectStyles(<App {...props} />))
-    const styleTags = sheet.getStyleElement()
-    const styles = flush()
-    return { ...page, styleTags, styles }
+    const originalRenderPage = ctx.renderPage
+
+    try {
+      ctx.renderPage = () =>
+        originalRenderPage({
+          enhanceApp: App => props => sheet.collectStyles(<App {...props} />)
+        })
+
+      const initialProps = await Document.getInitialProps(ctx)
+      return {
+        ...initialProps,
+        styles: (
+          <>
+            {initialProps.styles}
+            {sheet.getStyleElement()}
+          </>
+        )
+      }
+    } finally {
+      sheet.seal()
+    }
   }
 
   render() {
     return (
-      <html>
+      <Html>
         <Head>
-          <style>{'body { margin: 0 } /* custom! */'}</style>
+          <style>{`body { margin: 0 } /* custom! */`}</style>
           <meta name='viewport' content='width=device-width, initial-scale=1' />
           <meta charSet='utf-8' />
           <link
@@ -27,15 +40,12 @@ class AppDocument extends Document {
             rel='stylesheet'
           />
           <script src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.1/socket.io.js' />
-          {this.props.styleTags}
         </Head>
         <body>
           <Main />
           <NextScript />
         </body>
-      </html>
+      </Html>
     )
   }
 }
-
-export default AppDocument
