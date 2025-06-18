@@ -109,8 +109,11 @@ class Sidebar extends Component {
         )}
         <ul className='menu'>
           {menu.map(item => (
-            <Link href={item.path} key={item.path}>
-              <li className={item.path == router.pathname && 'active'}>
+            <li
+              key={item.path}
+              className={item.path == router.pathname ? 'active' : ''}
+            >
+              <Link href={item.path} legacyBehavior>
                 <a>
                   <FontAwesomeIcon icon={item.icon} fixedWidth />
                   <span className={'text'}>
@@ -118,8 +121,8 @@ class Sidebar extends Component {
                     {item.name}
                   </span>
                 </a>
-              </li>
-            </Link>
+              </Link>
+            </li>
           ))}
         </ul>
         {loggedIn && (
