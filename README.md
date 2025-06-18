@@ -32,7 +32,7 @@ Use the demo website at [http://digitaldisplay.herokuapp.com](http://digitaldisp
 ```bash
 npm run setup
 ```
-and specify the URI to your database.
+This command checks if a `.env` file exists and, if not, runs the interactive `makeconf` utility. Specify the URI to your database when prompted.
 
 4. Install dependencies and run the program
 

@@ -6,14 +6,13 @@ const passport = require('passport')
 const cookieParser = require('cookie-parser')
 const session = require('cookie-session')
 const bodyParser = require('body-parser')
-const socketIo = require('socket.io')
+const { Server: SocketIoServer } = require('socket.io')
 
 const Keys = require('./keys')
 
 const dev = Keys.ENVIRON !== 'PROD'
 const app = next({ dev })
-const routes = require('./routes')
-const handle = routes.getRequestHandler(app)
+const handle = app.getRequestHandler()
 
 const apiRoutes = require('./api/routes')
 const User = require('./api/models/User')
@@ -32,10 +31,10 @@ app
 
     // MongoDB
     mongoose.Promise = Promise
-    mongoose.connect(
-      Keys.MONGODB_URI,
-      { useNewUrlParser: true }
-    )
+    mongoose.connect(Keys.MONGODB_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true
+    })
     const db = mongoose.connection
     db.on('error', console.error.bind(console, 'connection error:'))
 
@@ -86,7 +85,7 @@ app
     })
 
     // Socket.io
-    io = socketIo.listen(finalServer)
+    io = new SocketIoServer(finalServer)
   })
   .catch(ex => {
     // eslint-disable-next-line
