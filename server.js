@@ -108,7 +108,7 @@ app
     server.use('/uploads', express.static('uploads'))
 
     // Error logger
-    server.use(function(err, req, res, next) {
+    server.use(function(err, req, res) {
       const message = `${new Date().toISOString()} ${err.stack}\n`
       errorLogStream.write(message)
       console.error(message)
