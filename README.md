@@ -34,15 +34,17 @@ This project requires **Node.js 18** or later.
 ```bash
 npm run setup
 ```
-This command checks if a `.env` file exists and, if not, runs the interactive `makeconf` utility. Specify the URI to your database when prompted.
+This command checks if a `.env` file exists. If not, it copies `.env.example` (if present) to `.env`. When no example file is found, it falls back to running the interactive `makeconf` utility so you can provide your own values.
 
-An example configuration is provided in `.env.example` using a test MongoDB URI:
+The script copies configuration from `.env.example`. Update the file as needed.
+
+The default example uses the following MongoDB URI:
 
 ```bash
 MONGODB_URI=mongodb+srv://bdowdy:November15@cluster0.onongy1.mongodb.net/
 ```
 
-4. Install dependencies and run the program
+3. Install dependencies and run the program
 
 ```bash
 npm install
