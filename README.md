@@ -51,7 +51,9 @@ npm install
 npm run dev
 ```
 
-Server activity and errors are written to `logs/access.log` and `logs/error.log` respectively.
+Server activity and errors are written to `logs/access.log` and `logs/error.log`.
+When running `npm run dev`, the same information is also printed to the console so
+you can see issues immediately.
 
 ### Updating the software
 

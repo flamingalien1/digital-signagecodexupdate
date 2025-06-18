@@ -24,15 +24,25 @@ const logDirectory = path.join(__dirname, 'logs')
 if (!fs.existsSync(logDirectory)) {
   fs.mkdirSync(logDirectory)
 }
-const accessLogStream = fs.createWriteStream(path.join(logDirectory, 'access.log'), { flags: 'a' })
-const errorLogStream = fs.createWriteStream(path.join(logDirectory, 'error.log'), { flags: 'a' })
+const accessLogStream = fs.createWriteStream(
+  path.join(logDirectory, 'access.log'),
+  { flags: 'a' }
+)
+const errorLogStream = fs.createWriteStream(
+  path.join(logDirectory, 'error.log'),
+  { flags: 'a' }
+)
 
 process.on('unhandledRejection', err => {
-  errorLogStream.write(`${new Date().toISOString()} UnhandledRejection: ${err.stack}\n`)
+  const message = `${new Date().toISOString()} UnhandledRejection: ${err.stack}\n`
+  errorLogStream.write(message)
+  console.error(message)
 })
 
 process.on('uncaughtException', err => {
-  errorLogStream.write(`${new Date().toISOString()} UncaughtException: ${err.stack}\n`)
+  const message = `${new Date().toISOString()} UncaughtException: ${err.stack}\n`
+  errorLogStream.write(message)
+  console.error(message)
   process.exit(1)
 })
 
@@ -41,6 +51,9 @@ app
   .then(() => {
     const server = express()
 
+    if (dev) {
+      server.use(morgan('dev'))
+    }
     server.use(morgan('combined', { stream: accessLogStream }))
 
     // Allows for cross origin domain request:
@@ -98,6 +111,7 @@ app
     server.use(function(err, req, res, next) {
       const message = `${new Date().toISOString()} ${err.stack}\n`
       errorLogStream.write(message)
+      console.error(message)
       res.status(err.status || 500).json({ error: err.message })
     })
 
