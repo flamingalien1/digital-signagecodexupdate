@@ -1,6 +1,9 @@
 @echo off
 REM Windows start script for DigitalSignage
 
+REM Ensure we're running from the script directory
+cd /d %~dp0
+
 echo Installing dependencies...
 npm install
 if %ERRORLEVEL% NEQ 0 (
