@@ -6,6 +6,7 @@ import { fab } from '@fortawesome/free-brands-svg-icons'
 
 config.autoAddCss = false
 library.add(fas, fab)
+
 function DropdownButton({
   icon = null,
   text = 'Show menu',
@@ -17,18 +18,25 @@ function DropdownButton({
 }) {
   const [open, setOpen] = useState(false)
   const menuRef = useRef(null)
-
+  const btnRef = useRef(null)
   useEffect(() => {
-    function handleClickOutside(event) {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
+    function handleOutside(event) {
+      if (
+        menuRef.current &&
+        !menuRef.current.contains(event.target) &&
+        btnRef.current &&
+        !btnRef.current.contains(event.target)
+      ) {
         setOpen(false)
       }
     }
 
     if (open) {
-      document.addEventListener('click', handleClickOutside)
+      document.addEventListener('mousedown', handleOutside)
     }
-    return () => document.removeEventListener('click', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleOutside)
+    }
   }, [open])
 
   const toggleMenu = event => {
@@ -43,34 +51,46 @@ function DropdownButton({
 
   return (
     <div className='dropdownContainer'>
-      {children ? (
-        <div style={style} onClick={toggleMenu}>
-          {children}
-        </div>
-      ) : (
-        <button className='btn' onClick={toggleMenu} style={style}>
-          <div className='btnIcon'>{icon && <FontAwesomeIcon icon={icon} />}</div>
-          {text}
-        </button>
-      )}
+      <button
+        ref={btnRef}
+        className={children ? undefined : 'btn'}
+        onClick={toggleMenu}
+        style={style}
+        type='button'
+      >
+        {children ? (
+          children
+        ) : (
+          <>
+            {icon && (
+              <span className='btnIcon'>
+                <FontAwesomeIcon icon={icon} />
+              </span>
+            )}
+            {text}
+          </>
+        )}
+      </button>
 
       {open && (
-        <div className='menu' ref={menuRef} style={menuStyle}>
+        <ul className='menu' ref={menuRef} style={menuStyle}>
           {choices.map(choice => (
-            <button
-              key={choice.key}
-              className='choice'
-              onClick={() => handleChoice(choice.key)}
-            >
-              {choice.icon && (
-                <div className='btnIcon'>
-                  <FontAwesomeIcon icon={choice.icon} prefix='fab' />
-                </div>
-              )}
-              {choice.name}
-            </button>
+            <li key={choice.key} className='choiceItem'>
+              <button
+                className='choice'
+                type='button'
+                onClick={() => handleChoice(choice.key)}
+              >
+                {choice.icon && (
+                  <span className='btnIcon'>
+                    <FontAwesomeIcon icon={choice.icon} />
+                  </span>
+                )}
+                {choice.name}
+              </button>
+            </li>
           ))}
-        </div>
+        </ul>
       )}
       <style jsx>{`
         .dropdownContainer {
@@ -102,14 +122,18 @@ function DropdownButton({
           position: absolute;
           top: calc(100% + 8px);
           left: 0;
-          display: flex;
-          flex-direction: column;
+          padding: 0;
+          margin: 0;
+          list-style: none;
           z-index: 2;
           background: white;
           box-shadow: 4px 4px 16px rgba(0, 0, 0, 0.1);
           border-radius: 4px;
           overflow: hidden;
           min-width: 100%;
+        }
+        .choiceItem:not(:last-child) .choice {
+          border-bottom: 1px solid #efefef;
         }
         .choice {
           font-family: 'Open Sans', sans-serif;
@@ -120,7 +144,6 @@ function DropdownButton({
           min-width: 200px;
           font-size: 14px;
           border: none;
-          border-bottom: 1px solid #efefef;
           display: flex;
           padding: 16px;
           padding-left: 24px;
