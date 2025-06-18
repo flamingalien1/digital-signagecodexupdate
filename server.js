@@ -6,7 +6,7 @@ const passport = require('passport')
 const cookieParser = require('cookie-parser')
 const session = require('cookie-session')
 const bodyParser = require('body-parser')
-const socketIo = require('socket.io')
+const { Server: SocketIoServer } = require('socket.io')
 
 const Keys = require('./keys')
 
@@ -85,7 +85,7 @@ app
     })
 
     // Socket.io
-    io = socketIo.listen(finalServer)
+    io = new SocketIoServer(finalServer)
   })
   .catch(ex => {
     // eslint-disable-next-line
