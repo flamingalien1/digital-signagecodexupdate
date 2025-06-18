@@ -53,6 +53,7 @@ data in a local JSON file instead.
 npm install
 npm run dev
 ```
+For Windows users, run `start.bat` to automatically install dependencies, run setup, and start the server.
 
 Server activity and errors are written to `logs/access.log` and `logs/error.log`.
 When running `npm run dev`, the same information is also printed to the console so
