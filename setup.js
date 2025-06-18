@@ -1,7 +1,7 @@
 const fs = require('fs')
-const { spawnSync } = require('child_process')
+const { execSync } = require('child_process')
 
 if (!fs.existsSync('.env')) {
-  const cmd = process.platform === 'win32' ? 'npx.cmd' : 'npx'
-  spawnSync(cmd, ['--yes', 'makeconf'], { stdio: 'inherit' })
+  const command = 'npx -y makeconf'
+  execSync(command, { stdio: 'inherit', shell: true })
 }
