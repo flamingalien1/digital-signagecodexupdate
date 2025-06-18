@@ -27,25 +27,14 @@ Use the demo website at [http://digitaldisplay.herokuapp.com](http://digitaldisp
 
 This project requires **Node.js 18** or later.
 
-1. Set up a MongoDB installation locally (or in the cloud) and create a `digitaldisplay` database
-
-2. Run the setup utility using
+1. Run the setup utility using
 
 ```bash
 npm run setup
 ```
 This command checks if a `.env` file exists. If not, it copies `.env.example` (if present) to `.env`. When no example file is found, it falls back to running the interactive `makeconf` utility so you can provide your own values.
 
-The script copies configuration from `.env.example`. Update the file as needed.
-
-The default example uses the following MongoDB URI:
-
-```bash
-MONGODB_URI=mongodb+srv://bdowdy:November15@cluster0.onongy1.mongodb.net/
-```
-
-If you don't have MongoDB available, set `USE_FILE_DB=true` in `.env` to store
-data in a local JSON file instead.
+The script copies configuration from `.env.example`. Update the file as needed. By default the application stores all data in a local JSON file.
 
 3. Install dependencies and run the program
 
