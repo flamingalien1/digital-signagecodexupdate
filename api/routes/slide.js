@@ -4,7 +4,7 @@ const multer = require('multer')
 const path = require('path')
 
 const CommonHelper = require('../helpers/common_helper')
-const Slide = require('../models/Slide')
+const { Slide } = require('../../db')
 const SlideHelper = require('../helpers/slide_helper')
 
 const storage = multer.diskStorage({

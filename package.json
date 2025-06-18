@@ -80,7 +80,8 @@
     "styled-components": "^6.1.9",
     "superagent": "^5.0.5",
     "webfontloader": "^1.6.28",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "lowdb": "^1.0.0"
   },
   "devDependencies": {
     "cross-env": "^7.0.1"

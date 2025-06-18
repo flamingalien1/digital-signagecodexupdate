@@ -44,6 +44,9 @@ The default example uses the following MongoDB URI:
 MONGODB_URI=mongodb+srv://bdowdy:November15@cluster0.onongy1.mongodb.net/
 ```
 
+If you don't have MongoDB available, set `USE_FILE_DB=true` in `.env` to store
+data in a local JSON file instead.
+
 3. Install dependencies and run the program
 
 ```bash

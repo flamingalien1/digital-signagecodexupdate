@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router()
 
-const Widget = require('../models/Widget')
+const { Widget } = require('../../db')
 const CommonHelper = require('../helpers/common_helper')
 const WidgetHelper = require('../helpers/widget_helper')
 

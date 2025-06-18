@@ -1,4 +1,4 @@
-const Slideshow = require('../models/Slideshow')
+const { Slideshow } = require('../../db')
 const CommonHelper = require('./common_helper')
 
 function addSlide(slide, res, next) {

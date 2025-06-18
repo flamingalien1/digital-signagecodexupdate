@@ -18,7 +18,7 @@ const app = next({ dev })
 const handle = app.getRequestHandler()
 
 const apiRoutes = require('./api/routes')
-const User = require('./api/models/User')
+const { User } = require('./db')
 
 const logDirectory = path.join(__dirname, 'logs')
 if (!fs.existsSync(logDirectory)) {
@@ -63,14 +63,16 @@ app
       next()
     })
 
-    // MongoDB
-    mongoose.Promise = Promise
-    mongoose.connect(Keys.MONGODB_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true
-    })
-    const db = mongoose.connection
-    db.on('error', console.error.bind(console, 'connection error:'))
+    // Database
+    if (!Keys.USE_FILE_DB) {
+      mongoose.Promise = Promise
+      mongoose.connect(Keys.MONGODB_URI, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+      })
+      const db = mongoose.connection
+      db.on('error', console.error.bind(console, 'connection error:'))
+    }
 
     // Parse application/x-www-form-urlencoded
     server.use(bodyParser.urlencoded({ extended: false }))
@@ -89,11 +91,13 @@ app
     )
 
     // Passport
-    passport.use(User.createStrategy())
-    passport.serializeUser(User.serializeUser())
-    passport.deserializeUser(User.deserializeUser())
-    server.use(passport.initialize())
-    server.use(passport.session())
+    if (!Keys.USE_FILE_DB) {
+      passport.use(User.createStrategy())
+      passport.serializeUser(User.serializeUser())
+      passport.deserializeUser(User.deserializeUser())
+      server.use(passport.initialize())
+      server.use(passport.session())
+    }
 
     let io
     server.use(function(req, res, next) {

@@ -1,4 +1,4 @@
-const Display = require('../models/Display')
+const { Display } = require('../../db')
 const CommonHelper = require('./common_helper')
 
 function addWidget(widget, res) {
