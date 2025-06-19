@@ -1,24 +1,35 @@
 const express = require('express')
 const router = express.Router()
 
-const Display = require('../models/Display')
+const { Display, Widget } = require('../../db')
+const Keys = require('../../keys')
 const DisplayHelper = require('../helpers/display_helper')
 const CommonHelper = require('../helpers/common_helper')
 
 // Route: /api/v1/display
 router
-  .get('/', (req, res, next) => {
-    return Display.find({})
-      .populate('widgets')
-      .then(displays =>
-        displays && displays.length > 0
-          ? displays
-          : DisplayHelper.newDisplay(req).then(() => Display.find({}).populate('widgets'))
-      )
-      .then(displays => {
-        return res.json(displays)
-      })
-      .catch(err => next(err))
+  .get('/', async (req, res, next) => {
+    try {
+      let displays = await Display.find({})
+      if (Keys.USE_FILE_DB) {
+        if (!displays.length) {
+          await DisplayHelper.newDisplay(req)
+          displays = await Display.find({})
+        }
+        displays = displays.map(d => ({
+          ...d,
+          widgets: d.widgets.map(id => Widget.findById(id))
+        }))
+      } else {
+        if (!displays.length) {
+          await DisplayHelper.newDisplay(req)
+        }
+        displays = await Display.find({}).populate('widgets')
+      }
+      res.json(displays)
+    } catch (err) {
+      next(err)
+    }
   })
   .post('/', (req, res, next) => {
     return DisplayHelper.newDisplay(req, res, next)
@@ -33,23 +44,40 @@ router
 
 // Route: /api/v1/display/:id
 router
-  .get('/:id', (req, res, next) => {
-    const { id } = req.params
-    return Display.findById(id)
-      .populate('widgets')
-      .then(display => {
-        return res.json(display)
-      })
-      .catch(err => next(err))
+  .get('/:id', async (req, res, next) => {
+    try {
+      const { id } = req.params
+      let display = await Display.findById(id)
+      if (!display) return next(new Error('Display not found'))
+      if (Keys.USE_FILE_DB) {
+        display = {
+          ...display,
+          widgets: display.widgets.map(wid => Widget.findById(wid))
+        }
+      } else {
+        display = await Display.findById(id).populate('widgets')
+      }
+      res.json(display)
+    } catch (err) {
+      next(err)
+    }
   })
-  .get('/:id/widgets', (req, res, next) => {
-    const { id } = req.params
-    return Display.findById(id)
-      .populate('widgets')
-      .then(display => {
-        return res.json(display.widgets)
-      })
-      .catch(err => next(err))
+  .get('/:id/widgets', async (req, res, next) => {
+    try {
+      const { id } = req.params
+      let display = await Display.findById(id)
+      if (!display) return next(new Error('Display not found'))
+      let widgets
+      if (Keys.USE_FILE_DB) {
+        widgets = display.widgets.map(wid => Widget.findById(wid))
+      } else {
+        display = await Display.findById(id).populate('widgets')
+        widgets = display.widgets
+      }
+      res.json(widgets)
+    } catch (err) {
+      next(err)
+    }
   })
   .delete('/:id', (req, res, next) => {
     const { id } = req.params

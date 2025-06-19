@@ -94,7 +94,7 @@ class Login extends Component {
                 Use the username "demo" and password "demo"
               </span>
             </div>
-            <label for='username'>Username</label>
+            <label htmlFor='username'>Username</label>
             <input
               type='text'
               className='username'
@@ -102,7 +102,7 @@ class Login extends Component {
               placeholder='Enter your username...'
               onChange={this.usernameChangeHandler}
             />
-            <label for='password'>Password</label>
+            <label htmlFor='password'>Password</label>
             <input
               type='password'
               className='password'

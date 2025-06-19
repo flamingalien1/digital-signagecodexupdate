@@ -1,50 +1,13 @@
 import { Component } from 'react'
 import React from 'react'
 import ContentLoader from 'react-content-loader'
-import { SortableContainer, SortableElement } from 'react-sortable-hoc'
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 import arrayMove from 'array-move'
 
 import SlideCard from './SlideCard'
 
 import { getSlides } from '../../actions/slide'
 import { reorderSlides } from '../../actions/slideshow'
-
-const SortableItem = SortableElement(SlideCard)
-
-const SortableList = SortableContainer(({ items, refresh }) => {
-  return (
-    <div className={'list'}>
-      <div className={'timeline'} />
-      {items.map((value, index) => (
-        <SortableItem
-          key={`item-${index}`}
-          index={index}
-          id={index}
-          value={value}
-          refresh={refresh}
-        />
-      ))}
-      <style jsx>
-        {`
-          .list {
-            position: relative;
-          }
-          .timeline {
-            width: 4px;
-            height: calc(100% - 20px);
-            border-radius: 2px;
-            position: absolute;
-            left: 50%;
-            top: 10px;
-            margin-left: -2px;
-            background: #cccccc;
-            z-index: 0;
-          }
-        `}
-      </style>
-    </div>
-  )
-})
 
 class SlideList extends Component {
   constructor(props) {
@@ -64,11 +27,14 @@ class SlideList extends Component {
     })
   }
 
-  onSortEnd = ({ oldIndex, newIndex }) => {
+  onDragEnd = result => {
+    if (!result.destination) return
     const { slideshow } = this.props
+    const { index: oldIndex } = result.source
+    const { index: newIndex } = result.destination
     this.setState(
       {
-        slides: [...arrayMove(this.state.slides, oldIndex, newIndex)]
+        slides: arrayMove(this.state.slides, oldIndex, newIndex)
       },
       () => {
         reorderSlides(slideshow, oldIndex, newIndex)
@@ -88,13 +54,45 @@ class SlideList extends Component {
   render() {
     const { slides } = this.state
     return slides ? (
-      <SortableList
-        items={slides}
-        refresh={this.refresh}
-        onSortEnd={this.onSortEnd}
-        distance={2}
-        lockAxis='y'
-      />
+      <DragDropContext onDragEnd={this.onDragEnd}>
+        <Droppable droppableId='slides'>
+          {provided => (
+            <div className={'list'} ref={provided.innerRef} {...provided.droppableProps}>
+              <div className={'timeline'} />
+              {slides.map((value, index) => (
+                <Draggable key={value._id} draggableId={value._id} index={index}>
+                  {provided2 => (
+                    <div
+                      ref={provided2.innerRef}
+                      {...provided2.draggableProps}
+                      {...provided2.dragHandleProps}
+                    >
+                      <SlideCard index={index} value={value} refresh={this.refresh} />
+                    </div>
+                  )}
+                </Draggable>
+              ))}
+              {provided.placeholder}
+              <style jsx>{`
+                .list {
+                  position: relative;
+                }
+                .timeline {
+                  width: 4px;
+                  height: calc(100% - 20px);
+                  border-radius: 2px;
+                  position: absolute;
+                  left: 50%;
+                  top: 10px;
+                  margin-left: -2px;
+                  background: #cccccc;
+                  z-index: 0;
+                }
+              `}</style>
+            </div>
+          )}
+        </Droppable>
+      </DragDropContext>
     ) : (
       Array(4)
         .fill()

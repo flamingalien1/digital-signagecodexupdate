@@ -1,5 +1,4 @@
-const Widget = require('../models/Widget')
-const Display = require('../models/Display')
+const { Widget, Display } = require('../../db')
 const CommonHelper = require('./common_helper')
 
 function deleteWidgets(widgets, res) {

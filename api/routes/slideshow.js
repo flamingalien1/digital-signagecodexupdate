@@ -2,19 +2,28 @@ const express = require('express')
 const router = express.Router()
 const arrayMove = require('array-move')
 
-const Slideshow = require('../models/Slideshow')
+const { Slideshow, Slide } = require('../../db')
+const Keys = require('../../keys')
 const SlideshowHelper = require('../helpers/slideshow_helper')
 const CommonHelper = require('../helpers/common_helper')
 
 // Route: /api/v1/slideshow
 router
-  .get('/', (req, res, next) => {
-    return Slideshow.find({})
-      .populate('slides')
-      .then(slideshows => {
-        return res.json(slideshows)
-      })
-      .catch(err => next(err))
+  .get('/', async (req, res, next) => {
+    try {
+      let slideshows = await Slideshow.find({})
+      if (Keys.USE_FILE_DB) {
+        slideshows = slideshows.map(s => ({
+          ...s,
+          slides: s.slides.map(id => Slide.findById(id))
+        }))
+      } else {
+        slideshows = await Slideshow.find({}).populate('slides')
+      }
+      res.json(slideshows)
+    } catch (err) {
+      next(err)
+    }
   })
   .post('/', (req, res, next) => {
     const newSlideShow = new Slideshow({
@@ -33,23 +42,40 @@ router
 
 // Route: /api/v1/slideshow/:id
 router
-  .get('/:id', (req, res, next) => {
-    const { id } = req.params
-    return Slideshow.findById(id)
-      .populate('slides')
-      .then(slideshow => {
-        return res.json(slideshow)
-      })
-      .catch(err => next(err))
+  .get('/:id', async (req, res, next) => {
+    try {
+      const { id } = req.params
+      let slideshow = await Slideshow.findById(id)
+      if (!slideshow) return next(new Error('Slideshow not found'))
+      if (Keys.USE_FILE_DB) {
+        slideshow = {
+          ...slideshow,
+          slides: slideshow.slides.map(id => Slide.findById(id))
+        }
+      } else {
+        slideshow = await Slideshow.findById(id).populate('slides')
+      }
+      res.json(slideshow)
+    } catch (err) {
+      next(err)
+    }
   })
-  .get('/:id/slides', (req, res, next) => {
-    const { id } = req.params
-    return Slideshow.findById(id)
-      .populate('slides')
-      .then(slideshow => {
-        return res.json(slideshow.slides)
-      })
-      .catch(err => next(err))
+  .get('/:id/slides', async (req, res, next) => {
+    try {
+      const { id } = req.params
+      let slideshow = await Slideshow.findById(id)
+      if (!slideshow) return next(new Error('Slideshow not found'))
+      let slides
+      if (Keys.USE_FILE_DB) {
+        slides = slideshow.slides.map(id => Slide.findById(id))
+      } else {
+        slideshow = await Slideshow.findById(id).populate('slides')
+        slides = slideshow.slides
+      }
+      res.json(slides)
+    } catch (err) {
+      next(err)
+    }
   })
   .delete('/:id', (req, res, next) => {
     const { id } = req.params

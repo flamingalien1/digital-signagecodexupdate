@@ -1,37 +1,78 @@
 const express = require('express')
 const router = express.Router()
-const mongooseCrudify = require('mongoose-crudify')
 
-const Widget = require('../models/Widget')
+const { Widget } = require('../../db')
 const CommonHelper = require('../helpers/common_helper')
 const WidgetHelper = require('../helpers/widget_helper')
 
-/**
- *  list    - GET /widgets/
- *  create  - POST /widgets/
- *  read    - GET /widgets/{id}/
- *  update  - PUT /widgets/{id}/
- *  delete  - DELETE /widgets/{id}/
- */
-router.use(
-  '/',
-  mongooseCrudify({
-    Model: Widget,
-    afterActions: [
-      {
-        middlewares: [CommonHelper.broadcastUpdateMiddleware],
-        only: ['update']
-      },
-      {
-        middlewares: [WidgetHelper.addWidget, CommonHelper.broadcastUpdateMiddleware],
-        only: ['create']
-      },
-      {
-        middlewares: [WidgetHelper.deleteWidget, CommonHelper.broadcastUpdateMiddleware],
-        only: ['delete']
-      }
-    ]
-  })
-)
+// GET /widgets
+router.get('/', async (req, res, next) => {
+  try {
+    const widgets = await Widget.find({})
+    res.json(widgets)
+  } catch (err) {
+    next(err)
+  }
+})
+
+// POST /widgets
+router.post('/', async (req, res, next) => {
+  try {
+    const widget = new Widget({
+      type: req.body.type,
+      data: req.body.data,
+      display: req.body.display,
+      x: req.body.x,
+      y: req.body.y,
+      w: req.body.w,
+      h: req.body.h
+    })
+    await widget.save()
+    await WidgetHelper.addWidget(widget, res)
+    await CommonHelper.broadcastUpdate(res.io)
+  } catch (err) {
+    next(err)
+  }
+})
+
+// GET /widgets/:id
+router.get('/:id', async (req, res, next) => {
+  try {
+    const widget = await Widget.findById(req.params.id)
+    if (!widget) return next(new Error('Widget not found'))
+    res.json(widget)
+  } catch (err) {
+    next(err)
+  }
+})
+
+// PUT /widgets/:id
+router.put('/:id', async (req, res, next) => {
+  try {
+    const widget = await Widget.findById(req.params.id)
+    if (!widget) return next(new Error('Widget not found'))
+
+    ;['type', 'data', 'display', 'x', 'y', 'w', 'h'].forEach(key => {
+      if (req.body[key] !== undefined) widget[key] = req.body[key]
+    })
+
+    await widget.save()
+    await CommonHelper.broadcastUpdate(res.io)
+    res.json({ success: true })
+  } catch (err) {
+    next(err)
+  }
+})
+
+// DELETE /widgets/:id
+router.delete('/:id', async (req, res, next) => {
+  try {
+    const widget = await Widget.findByIdAndDelete(req.params.id)
+    if (!widget) return next(new Error('Widget not found'))
+    await WidgetHelper.deleteWidget(widget, res)
+  } catch (err) {
+    next(err)
+  }
+})
 
 module.exports = router

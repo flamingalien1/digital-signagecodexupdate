@@ -2,7 +2,7 @@ const ReactEasyState = require('react-easy-state')
 const store = ReactEasyState.store
 const _ = require('lodash')
 const DisplayActions = require('../actions/display')
-const shortid = require('shortid')
+const { nanoid } = require('nanoid')
 
 const updateDisplayThrottled = _.debounce((id, data) => {
   return DisplayActions.updateDisplay(id, data)
@@ -38,7 +38,7 @@ const display = store({
     updateDisplayThrottled(display.id, { layout })
   },
   addStatusBarItem(type) {
-    display.statusBar = [...display.statusBar, type + '_' + shortid.generate()]
+    display.statusBar = [...display.statusBar, type + '_' + nanoid()]
     updateDisplayThrottled(display.id, { statusBar: display.statusBar })
     return Promise.resolve()
   },

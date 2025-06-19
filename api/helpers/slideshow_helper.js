@@ -1,4 +1,4 @@
-const Slide = require('../models/Slide')
+const { Slide } = require('../../db')
 const CommonHelper = require('./common_helper')
 
 function deleteSlides(slides, res) {

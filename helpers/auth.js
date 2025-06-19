@@ -36,13 +36,7 @@ export const protect = Component =>
           ? 'http://' + req.headers.host
           : window.location.origin
 
-      if ((req && req.user) || alreadyLoggedIn) {
-        if (!alreadyLoggedIn) {
-          setCookie(ctx, 'loggedIn', true, {
-            maxAge: 30 * 24 * 60 * 60,
-            path: '/'
-          })
-        }
+      if (alreadyLoggedIn) {
 
         let displayId = query && query.display
 

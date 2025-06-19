@@ -4,16 +4,16 @@ import { faPencilAlt } from '@fortawesome/free-solid-svg-icons'
 import _ from 'lodash'
 import { view } from 'react-easy-state'
 
-import Frame from '../components/Admin/Frame.js'
-import SlideList from '../components/Admin/SlideList.js'
-import SlideEditDialog from '../components/Admin/SlideEditDialog'
-import Upload from '../components/Upload.js'
-import Button from '../components/Form/Button.js'
-import Dialog from '../components/Dialog.js'
+import Frame from '../../components/Admin/Frame.js'
+import SlideList from '../../components/Admin/SlideList.js'
+import SlideEditDialog from '../../components/Admin/SlideEditDialog'
+import Upload from '../../components/Upload.js'
+import Button from '../../components/Form/Button.js'
+import Dialog from '../../components/Dialog.js'
 
-import { getSlideshow, updateSlideshow } from '../actions/slideshow'
-import { protect } from '../helpers/auth.js'
-import { display } from '../stores'
+import { getSlideshow, updateSlideshow } from '../../actions/slideshow'
+import { protect } from '../../helpers/auth.js'
+import { display } from '../../stores'
 
 const updateSlideshowThrottled = _.debounce((id, data) => {
   return updateSlideshow(id, data)
