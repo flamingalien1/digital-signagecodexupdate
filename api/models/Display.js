@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-const shortid = require('shortid')
+const { nanoid } = require('nanoid')
 
 const Schema = mongoose.Schema
 
@@ -9,10 +9,10 @@ const Display = new Schema({
   statusBar: {
     type: [{ type: String }],
     default: () => [
-      'date_' + shortid.generate(),
-      'spacer_' + shortid.generate(),
-      'connection_' + shortid.generate(),
-      'time_' + shortid.generate()
+      'date_' + nanoid(),
+      'spacer_' + nanoid(),
+      'connection_' + nanoid(),
+      'time_' + nanoid()
     ]
   },
   widgets: [{ type: Schema.Types.ObjectId, ref: 'Widget' }]
